@@ -1,6 +1,16 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://careerforge-r3cj.onrender.com/api';
+// Normalize the API base URL so that it always includes '/api' without duplicate slashes
+const getApiBaseUrl = () => {
+  let url = (import.meta.env.VITE_API_BASE_URL || 'https://careerforge-r3cj.onrender.com/api').trim();
+  url = url.replace(/\/+$/, '');
+  if (!url.endsWith('/api')) {
+    url = `${url}/api`;
+  }
+  return url;
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 const api = axios.create({
   baseURL: API_BASE_URL,
