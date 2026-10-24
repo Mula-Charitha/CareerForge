@@ -12,7 +12,11 @@ React + Vite (Frontend)  ---> REST API (JSON) ---> Spring Boot (Backend) ---> My
 
 - **Frontend**: React.js, Vite, JavaScript, React Router, Axios, Custom CSS Design System
 - **Backend**: Java 17+, Spring Boot 3.4.3, Spring Web, Spring Data JPA, Spring Security, MySQL Driver, Maven
-- **Port Defaults**:
+- **Live Deployment**:
+  - Frontend (Vercel): `https://career-forge-jade.vercel.app`
+  - Backend (Render): `https://careerforge-r3cj.onrender.com`
+  - Health Endpoint: `https://careerforge-r3cj.onrender.com/api/health`
+- **Port Defaults (Local)**:
   - Frontend: `http://localhost:5173`
   - Backend: `http://localhost:8080`
 
