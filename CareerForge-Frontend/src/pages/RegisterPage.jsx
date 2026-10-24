@@ -54,11 +54,18 @@ const RegisterPage = () => {
       await register(formData);
       navigate('/dashboard');
     } catch (err) {
+      console.error('Registration error details:', err);
       const responseData = err.response?.data;
       if (responseData?.fieldErrors) {
         setErrors(responseData.fieldErrors);
+      } else if (responseData?.message) {
+        setServerError(responseData.message);
+      } else if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
+        setServerError('Connection timed out. The Render backend may be waking up from free-tier sleep (~50s). Please wait a moment and try again.');
+      } else if (!err.response) {
+        setServerError('Cannot connect to backend service (Network/CORS error). Please verify the backend is active and CORS is permitted.');
       } else {
-        setServerError(responseData?.message || 'Registration failed. Please try again.');
+        setServerError(`Registration failed (${err.response?.status || 'Unknown error'}). Please try again.`);
       }
     } finally {
       setSubmitting(false);

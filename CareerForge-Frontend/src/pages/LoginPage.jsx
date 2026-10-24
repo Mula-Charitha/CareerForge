@@ -48,8 +48,17 @@ const LoginPage = () => {
       await login(formData);
       navigate('/dashboard');
     } catch (err) {
+      console.error('Login error details:', err);
       const responseData = err.response?.data;
-      setServerError(responseData?.message || 'Invalid email or password');
+      if (responseData?.message) {
+        setServerError(responseData.message);
+      } else if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
+        setServerError('Connection timed out. The Render backend may be waking up from free-tier sleep (~50s). Please wait a moment and try again.');
+      } else if (!err.response) {
+        setServerError('Cannot connect to backend service (Network/CORS error). Please check if backend is running.');
+      } else {
+        setServerError('Invalid email or password');
+      }
     } finally {
       setSubmitting(false);
     }

@@ -41,7 +41,8 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/health", "/api/auth/register", "/api/auth/login", "/api/auth/fix-passwords").permitAll()
+                .requestMatchers("/api/health", "/api/auth/register", "/api/auth/login", "/api/auth/fix-passwords", "/actuator/**").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/auth/me").authenticated()
                 .anyRequest().authenticated()
             )
@@ -72,19 +73,13 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Allowed origins: local dev + Vercel production frontend
-        // FRONTEND_URL env var is set in Render to your Vercel deployment URL
-        String frontendUrl = System.getenv("FRONTEND_URL");
-        List<String> origins = new java.util.ArrayList<>(
-            List.of("http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173")
-        );
-        if (frontendUrl != null && !frontendUrl.isBlank()) {
-            origins.add(frontendUrl);
-        }
-        configuration.setAllowedOrigins(origins);
-        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        // Allow all origin patterns so Vercel deployments (main and preview), custom domains, and localhost work seamlessly with credentials
+        configuration.setAllowedOriginPatterns(List.of("*"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
         configuration.setAllowedHeaders(List.of("*"));
+        configuration.setExposedHeaders(List.of("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
